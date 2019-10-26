@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="saywhen",
     description="Send notifications when command line job finishes",
-    version="0.0.1",
+    version="0.0.2",
     author="Yunqing Gong",
     author_email="gongyq10@gmail.com",
     long_description=long_description,
