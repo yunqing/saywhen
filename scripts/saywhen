@@ -3,7 +3,7 @@ import subprocess
 import sys
 import os
 import time
-from saywhen import notify, text_image, audio_names
+from saywhen import notify, text_image
 
 def print_help():
     print(text_image)
@@ -29,11 +29,11 @@ def main():
                 )
     except subprocess.CalledProcessError as err:
         time_elapsed = time.time() - tic
-        notify(False, time_elapsed, cwd, " ".join(sys.argv[1:]), audio_names)
+        notify(False, time_elapsed, " ".join(sys.argv[1:]), cwd)
         sys.exit(err.returncode)
     else:
         time_elapsed = time.time() - tic
-        notify(True, time_elapsed, cwd, " ".join(sys.argv[1:]), audio_names)
+        notify(True, time_elapsed, " ".join(sys.argv[1:]), cwd)
         sys.exit(0)
 
 
