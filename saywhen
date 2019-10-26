@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+import subprocess
+import sys
+import os
+import time
+
+g_text_image = """
+   _____            _       ____
+  / ___/____ ___  _| |     / / /_  ___  ____
+  \__ \/ __ `/ / / / | /| / / __ \/ _ \/ __ \\
+ ___/ / /_/ / /_/ /| |/ |/ / / / /  __/ / / /
+/____/\__,_/\__, / |__/|__/_/ /_/\___/_/ /_/
+           /____/
+                                   :-=+*
+                               +#%@@@@@%
+                              #@@@@@@@@%
+                          :-+*@@@@@@@@@%
+                     :##@@@@@%%@@@@@@@@%
+                     ***+-:    -+#%%#*+=
+           :---------#---
+           %:        *  *
+          :%         *  *
+          +#         *  +:
+          #+=++++++++#=++=
+          +*#@@@@@@@@@@%+-
+           =+*%@@@@@@%++=
+            :+=******+=:
+                :-+
+                 :+
+                 :+
+                 :+
+                 :+
+            =+**###***+=
+"""
+
+g_wrong_audio = "audio/142608__autistic-lucario__error.wav"
+g_right_audio = "audio/80921__justinbw__buttonchime02up.wav"
+
+def print_help():
+    print(g_text_image)
+    print("SayWhen sends sound and desktop notification to you when job finishes.")
+    print("Usage: saywhen command [args...]")
+    print("Usage: saywhen -h/--help")
+    print("Example: saywhen echo helloworld")
+    print("Example: saywhen \"echo -n hello && echo world\"")
+
+def notify(status, time_elapsed, cwd, command_str):
+    if status:
+        text_prefix = "✔️ Job Finished with"
+        audio = g_right_audio
+    else:
+        text_prefix = "✖ Job Failed after"
+        audio = g_wrong_audio
+    if time_elapsed < 60:
+        time_elapsed = "{:.2f}s".format(time_elapsed)
+    else:
+        minutes = int(time_elapsed // 60)
+        seconds = time_elapsed % 60
+        time_elapsed = "{}m{:.2f}s".format(minutes, seconds)
+    subprocess.check_call(
+            "notify-send '{} {}!' 'command:\n{}\n----\nworking direcory:\n{}'".format(
+            text_prefix,
+            time_elapsed,
+            " ".join(sys.argv[1:]),
+            cwd
+            ),
+        shell=True)
+    script_path = __file__ if not os.path.islink(__file__) else os.readlink(__file__)
+    subprocess.check_call("aplay {}".format(os.path.join(os.path.dirname(script_path),
+                                            audio)),
+                          shell=True,
+                          stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL,
+                          )
+
+def main():
+    if len(sys.argv) == 1 or \
+            (len(sys.argv) > 1 and (sys.argv[1] == "-h" or sys.argv[1] == "--help")):
+        print_help()
+        exit()
+    else:
+        cwd = os.getcwd()
+        tic = time.time()
+        try:
+            subprocess.check_call(
+                    "$SHELL -i -c '{}'".format(" ".join(sys.argv[1:])),
+                    shell=True,
+                    env=os.environ,
+                    executable=os.environ['SHELL'],
+                    )
+        except subprocess.CalledProcessError as err:
+            time_elapsed = time.time() - tic
+            notify(False, time_elapsed, cwd, " ".join(sys.argv[1:]))
+            sys.exit(err.returncode)
+        else:
+            time_elapsed = time.time() - tic
+            notify(True, time_elapsed, cwd, " ".join(sys.argv[1:]))
+            sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()
