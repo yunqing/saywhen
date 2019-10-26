@@ -1,4 +1,4 @@
-# Saywhen
+# SayWhen
 ```
    _____            _       ____
   / ___/____ ___  _| |     / / /_  ___  ____
@@ -43,7 +43,7 @@ Example: saywhen "echo -n hello && echo world"
 The returncode of saywhen is the same as the command.
 
 ## Installation
-`pip install git+https://github.com/yunqing/saywhen`
+`pip install saywhen`
 
 ## Unstallation
 `pip uninstall saywhen`
